@@ -48,6 +48,8 @@ class Presentation(models.Model):
         on_delete=models.CASCADE,
     )
 
+
+
     def approve(self):
         status = Status.objects.get(name="APPROVED")
         self.status = status
@@ -66,6 +68,7 @@ class Presentation(models.Model):
 
 
     # Status is inside an aggregate
+
     @classmethod
     def create(cls, **kwargs):
         kwargs["status"] = Status.objects.get(name="SUBMITTED")
