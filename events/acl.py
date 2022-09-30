@@ -7,9 +7,11 @@ def get_weather(state):
     r = requests.get(f"http://api.openweathermap.org/geo/1.0/direct?q={state}&appid={OPEN_WEATHER_API_KEY}").json()
     # print(r)
 
-    lat = r[0]["lat"]  #inside the list index 0 get the value of key "lat"
+
+    lat = r[0]["lat"]
+    #inside the list index 0 get the value of key "lat"
     lon = r[0]["lon"]
-    # print(lat)
+    print(lat)
     # print(lon)
 
     w = requests.get(f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={OPEN_WEATHER_API_KEY}").json()
@@ -21,7 +23,7 @@ def get_weather(state):
     # print(temperature) # in Fahrenheit
     description = w['weather'][0]['description']
     # print(description)
-    return {"weather": {temperature, description}}
+    return {"temp": temperature, "description": description}
 
 
 #https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}

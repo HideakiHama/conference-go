@@ -105,7 +105,12 @@ class ConferenceDetailEncoder(ModelEncoder):
 def api_show_conference(request, pk):
     if request.method == "GET":
         conference = Conference.objects.get(id=pk)
-        return JsonResponse(conference, encoder=ConferenceDetailEncoder,
+        state = conference.location.state.abbreviation
+        # print(state)
+        weather = get_weather(state)
+        # print(weather)
+        return JsonResponse({"conference": conference, "weather": weather},
+                            encoder=ConferenceDetailEncoder,
                             safe=False)
     elif request.method == "DELETE":
         count, _ = Conference.objects.filter(id=pk).delete()
@@ -121,15 +126,10 @@ def api_show_conference(request, pk):
 
     conference = Conference.objects.get(id=pk)
 
-    # Use the city and state abbreviation of the CoSnference's Location
-    # to call the get_weather_data ACL function and get back a dictionary
-    # that contains the weather data
 
-    weather = get_weather(content[location.state])
-    content.update(**weather)
 
     return JsonResponse(
-        {"conference": conference, "weather": weather},
+        conference,
         ConferenceDetailEncoder,
         safe=False,
     )
