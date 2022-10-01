@@ -82,6 +82,7 @@ def api_show_conference(request, pk):
         return JsonResponse({"conference": conference, "weather": weather},
                             encoder=ConferenceDetailEncoder,
                             safe=False)
+
     elif request.method == "DELETE":
         count, _ = Conference.objects.filter(id=pk).delete()
         return JsonResponse({"deleted": count > 0})

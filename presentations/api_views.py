@@ -24,17 +24,16 @@ def api_list_presentations(request, conference_id):
     else:
         content = json.loads(request.body)
         try:
-            if "status" in content:
-                status = Status.objects.get(id=conference_id)
-                print(status)
-                content["status"] = status
-
-        except Status.DoesNotExist:
+            conference = Conference.objects.get(id=conference_id)
+            content["conference"] = conference
+        except Conference.DoesNotExist:
             return JsonResponse(
-                {"message": "Invalid Status id"},
+                {"messgae": "Invalid conference id"},
                 status=400,
             )
+
         presentation = Presentation.create(**content)
+
 
         return JsonResponse(presentation,
                             encoder=PresentationDetailEncoder,
@@ -61,12 +60,16 @@ class PresentationDetailEncoder(ModelEncoder):
 @require_http_methods(["GET","DELETE","PUT"])
 def api_show_presentation(request, pk):
     if request.method == "GET":
-        presentation = Presentation.objects.get(id=pk)
+        try:
+            presentation = Presentation.objects.get(id=pk)
+        except Presentation.DoesNotExist:
+            return JsonResponse({"message": "presentation does not exist"},
+                                status=400)
         return JsonResponse(presentation,
                             encoder=PresentationDetailEncoder,
                             safe=False)
     elif request.method == "DELETE":
-        count, _ = Presentation.objects.get(id=pk).delete()
+        count, _ = Presentation.objects.filter(id=pk).delete()
         return JsonResponse({"deleted": count > 0})
     else:
         content = json.loads(request.body)
