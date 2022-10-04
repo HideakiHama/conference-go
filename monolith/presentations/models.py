@@ -48,7 +48,7 @@ class Presentation(models.Model):
         on_delete=models.CASCADE,
     )
 
-
+    #No other coe except the Presentation model should know about the Status model
 
     def approve(self):
         status = Status.objects.get(name="APPROVED")
