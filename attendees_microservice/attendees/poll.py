@@ -9,6 +9,7 @@ def get_conferences():
     response = requests.get(url)
     content = json.loads(response.content)
     for conference in content["conferences"]:
+        # for conference in content
         ConferenceVO.objects.update_or_create(
             import_href=conference["href"],
             defaults={"name": conference["name"]},

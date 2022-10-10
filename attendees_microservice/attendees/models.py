@@ -7,6 +7,15 @@ class ConferenceVO(models.Model):
     import_href = models.CharField(max_length=200, unique=True)
     name = models.CharField(max_length=200)
 
+
+class AccountVO(models.Model):
+    email = models.EmailField(max_length=254)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    is_active = models.BooleanField()
+    updated = models.DateField()
+
+
 class Attendee(models.Model):
     """
     The Attendee model represents someone that wants to attend
@@ -35,8 +44,8 @@ class Attendee(models.Model):
         try:
             self.badge
         # if ObjectDoesNotExist (exception) then create a
-        #badge instance with self as the value for the attendee
-        #property of the Badge
+        # badge instance with self as the value for the attendee
+        # property of the Badge
         except ObjectDoesNotExist:
             Badge.objects.create(attendee=self)
 

@@ -1,0 +1,13 @@
+# Base it on the python:3 base image
+FROM python:3
+# Run Python in unbuffered mode
+ENV PYTHONUNBUFFERED 1
+# Set the work directory to the normal /app directory
+WORKDIR /app
+# Copy the requirements.txt into the image
+COPY requirements.txt requirements.txt
+# Install the Python requirements from requirements.txt
+RUN pip install -r requirements.txt
+# For the default command to run, it should run the intended Python file that you will create:
+# CMD python attendees/account_info_consumer.py
+CMD [ "python", "attendees/account_info_consumer.py" ]

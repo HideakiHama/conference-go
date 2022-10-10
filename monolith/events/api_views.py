@@ -11,22 +11,26 @@ class ConferenceListEncoder(ModelEncoder):
     model = Conference
     properties = [
         "name",
+        # "presenter_name",
+        # "presenter_email",
+        # "title"
     ]
 
 
-@require_http_methods(["GET","POST"])
+@require_http_methods(["GET", "POST"])
 def api_list_conferences(request):
 
     if request.method == "GET":
         conferences = Conference.objects.all()
-        return JsonResponse({"conferences": conferences},
-                            encoder=ConferenceListEncoder)
+        return JsonResponse(
+            {"conferences": conferences}, encoder=ConferenceListEncoder
+        )
 
     else:
         content = json.loads(request.body)
 
         # Get the Location object and put it in the content dict
-        try:         #get id of ForeignKey from the Parent (Location)
+        try:  # get id of ForeignKey from the Parent (Location)
             location = Location.objects.get(id=content["location"])
             content["location"] = location
         except Location.DoesNotExist:
@@ -64,14 +68,15 @@ class ConferenceDetailEncoder(ModelEncoder):
         "location",
     ]
 
-    #Tells ModelEncoder that we want to use that specific
-    #encoder for the "location" property in the CongerenceDetailEncoder
+    # Tells ModelEncoder that we want to use that specific
+    # encoder for the "location" property in the ConferenceDetailEncoder
     encoders = {
         "location": LocationListEncoder(),
     }
 
+
 # conferences/<int:pk>/
-@require_http_methods(["GET","DELETE","PUT"])
+@require_http_methods(["GET", "DELETE", "PUT"])
 def api_show_conference(request, pk):
     if request.method == "GET":
         conference = Conference.objects.get(id=pk)
@@ -79,9 +84,11 @@ def api_show_conference(request, pk):
         # print(state)
         weather = get_weather(state)
         # print(weather)
-        return JsonResponse({"conference": conference, "weather": weather},
-                            encoder=ConferenceDetailEncoder,
-                            safe=False)
+        return JsonResponse(
+            {"conference": conference, "weather": weather},
+            encoder=ConferenceDetailEncoder,
+            safe=False,
+        )
 
     elif request.method == "DELETE":
         count, _ = Conference.objects.filter(id=pk).delete()
@@ -100,38 +107,41 @@ def api_show_conference(request, pk):
 
     return JsonResponse(
         conference,
-        ConferenceDetailEncoder,
+        ConferenceDetailEncoder,  ### encoder =???
         safe=False,
     )
+
 
 # locations/
 @require_http_methods(["GET", "POST"])
 def api_list_locations(request):
     if request.method == "GET":
         locations = Location.objects.all()
-        return JsonResponse({"location": locations},
-                            encoder=LocationListEncoder)
+        return JsonResponse(
+            {"location": locations}, encoder=LocationListEncoder
+        )
     else:
         content = json.loads(request.body)
 
         # Error handeling
         try:
             # Get the State object and put it in the content dic
-            #abbreviation equal to the value of the key "state"
+            # abbreviation equal to the value of the key "state"
             state = State.objects.get(abbreviation=content["state"])
             content["state"] = state
         except State.DoesNotExist:
-            return JsonResponse({"messgae": "Invalid state abbreviation"},
-                                status=400)
+            return JsonResponse(
+                {"messgae": "Invalid state abbreviation"}, status=400
+            )
 
         photo = get_photo(content["city"], content["state"])
         # print(photo)
-        content.update(**photo)  #check
+        content.update(**photo)  # check
 
         locations = Location.objects.create(**content)
-        return JsonResponse(locations, encoder=LocationDetailEncoder,
-                            safe=False)
-
+        return JsonResponse(
+            locations, encoder=LocationDetailEncoder, safe=False
+        )
 
 
 class LocationDetailEncoder(ModelEncoder):
@@ -142,20 +152,21 @@ class LocationDetailEncoder(ModelEncoder):
         "room_count",
         "created",
         "updated",
-        "picture_url"
+        "picture_url",
     ]
 
     def get_extra_data(self, o):
         return {"state": o.state.abbreviation}
+
 
 # locations/<int:pk>/
 @require_http_methods(["DELETE", "GET", "PUT"])
 def api_show_location(request, pk):
     if request.method == "GET":
         location = Location.objects.get(id=pk)
-        return JsonResponse(location,
-                            encoder=LocationDetailEncoder,
-                            safe=False)
+        return JsonResponse(
+            location, encoder=LocationDetailEncoder, safe=False
+        )
     elif request.method == "DELETE":
         count, _ = Location.objects.filter(id=pk).delete()
         return JsonResponse({"deleted": count > 0})
@@ -166,8 +177,10 @@ def api_show_location(request, pk):
                 state = State.objects.get(abbreviation=content["state"])
                 content["state"] = state
         except State.DoesNotExist:
-            return JsonResponse({"message": "Invalid state abbreviation"},
-                                status=400,)
+            return JsonResponse(
+                {"message": "Invalid state abbreviation"},
+                status=400,
+            )
 
         Location.objects.filter(id=pk).update(**content)
 
